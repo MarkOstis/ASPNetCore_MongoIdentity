@@ -1,0 +1,47 @@
+﻿@page
+@model ASPNetCore_MongoIdentity.Pages.RegistrationPageModel
+@using ASPNetCore_MongoIdentity.Models
+@{
+    ViewData["Title"] = "RegistrationPage";
+}
+
+<style>
+    .redtext {
+        color: red;
+    }
+</style>
+<div class="text-center">
+    <h1 class="display-4">Registration Page</h1>
+    <p></p>
+    @if (Model.IsUserExists == true)
+    {
+        <p class="redtext">Incorrect Name/Password</p>
+        Model.IsUserExists = false;
+    }
+    else
+    {
+        <p></p>
+    }
+    <form method="POST">
+        <input type="text" name="UserName" placeholder="UserName" /></br>
+        <input type="text" name="Password" placeholder="Password" /></br>
+        <input type="submit" asp-page-handler="RegisterNewUser" value="Register" />
+    </form>
+</div>
+<p></p>
+<table class="table">
+    <tr><td>Id</td><td>UserName</td><td>PasswordHash</td></tr>
+    @if (Model.DisplayUsers != null)
+    {
+        @foreach (ApplicationUser user in Model.DisplayUsers)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.UserName</td>
+                <td>@user.PasswordHash</td>
+            </tr>
+        }
+
+    }
+</table>
+
