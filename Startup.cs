@@ -38,17 +38,19 @@ namespace ASPNetCore_MongoIdentity
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddIdentityMongoDbProvider<ApplicationUser, ApplicationRole>(identityOptions =>
-                {
-                    identityOptions.Password.RequiredLength = 6;
-                    identityOptions.Password.RequireLowercase = true;
-                    identityOptions.Password.RequireUppercase = true;
-                    identityOptions.Password.RequireNonAlphanumeric = true;
-                    identityOptions.Password.RequireDigit = true;
-                }, mongoIdentityOptions =>
-                {
-                    mongoIdentityOptions.ConnectionString = Configuration.GetConnectionString("MongoDbDatabase");
-                });
+            services
+                .AddIdentityMongoDbProvider<ApplicationUser, ApplicationRole>(identityOptions =>
+                    {
+                        identityOptions.Password.RequiredLength = 6;
+                        identityOptions.Password.RequireLowercase = true;
+                        identityOptions.Password.RequireUppercase = true;
+                        identityOptions.Password.RequireNonAlphanumeric = true;
+                        identityOptions.Password.RequireDigit = true;
+                    }, mongoIdentityOptions =>
+                    {
+                        mongoIdentityOptions.ConnectionString = Configuration.GetConnectionString("MongoDbDatabase");
+                    })
+                .AddDefaultTokenProviders();
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
             services.AddAuthentication(options =>
@@ -75,7 +77,28 @@ namespace ASPNetCore_MongoIdentity
                        };
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.ConfigureApplicationCookie(options =>
+            {
+                var cookieOptions = new Microsoft.AspNetCore.Http.CookieOptions()
+                {
+                    Path = "/",
+                    HttpOnly = false,
+                    IsEssential = true, //<- there
+                    Expires = DateTime.Now.AddMonths(3),
+                };
+//                options.LoginPath = $"/RegistrationPage";
+//                options.LogoutPath = $"/Identity/Account/Logout";
+//                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+            });
+
+
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                //.AddRazorPagesOptions(option =>
+                //{
+                //    option.Conventions.AuthorizePage("/UserHomePage");
+                //});
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,6 +118,8 @@ namespace ASPNetCore_MongoIdentity
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseAuthentication();
 
             app.UseMvc();
         }

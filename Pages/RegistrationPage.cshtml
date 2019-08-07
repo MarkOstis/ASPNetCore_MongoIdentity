@@ -13,20 +13,21 @@
 <div class="text-center">
     <h1 class="display-4">Registration Page</h1>
     <p></p>
-    @if (Model.IsUserExists == true)
+    @if (Model.ErrorFlag == true)
     {
-        <p class="redtext">Incorrect Name/Password</p>
-        Model.IsUserExists = false;
+        <p class="redtext">Error Log In</p>
+        Model.ErrorFlag = false;
     }
     else
     {
         <p></p>
     }
-    <form method="POST">
-        <input type="text" name="UserName" placeholder="UserName" /></br>
-        <input type="text" name="Password" placeholder="Password" /></br>
-        <input type="submit" asp-page-handler="RegisterNewUser" value="Register" />
-    </form>
+<form method="POST">
+    <input type="text" name="UserName" placeholder="UserName" /></br>
+    <input type="text" name="Password" placeholder="Password" /></br>
+    <input type="submit" asp-page-handler="RegisterNewUser" value="Register" />
+    <input type="submit" asp-page-handler="LogIn" value="LogIn" />
+</form>
 </div>
 <p></p>
 <table class="table">

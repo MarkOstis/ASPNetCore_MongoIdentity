@@ -17,7 +17,7 @@ namespace ASPNetCore_MongoIdentity.Pages
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
 
-        public bool IsUserExists { get; set; }
+        public bool ErrorFlag { get; set; }
 
         public List<ApplicationUser> DisplayUsers { get; set; }
 
@@ -35,20 +35,47 @@ namespace ASPNetCore_MongoIdentity.Pages
 
         public async Task<IActionResult> OnPostRegisterNewUser(InputUserData inputUser)
         {
-            var user = new ApplicationUser { Name = inputUser.UserName, UserName = inputUser.UserName };
+            var user = new ApplicationUser { Name = inputUser.UserName,
+                                             UserName = inputUser.UserName,
+                                             Email = inputUser.UserName
+            };
             var result = await _userManager.CreateAsync(user, inputUser.Password);
 
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, false);
-                //var token = AuthenticationHelper.GenerateJwtToken(model.Email, user, _configuration);
 
-                //var rootData = new SignUpResponse(token, user.UserName, user.Email);
+//                var result2 = await _signInManager.PasswordSignInAsync(user.Email, inputUser.Password, true, lockoutOnFailure: true);
+                //if (result2.Succeeded)
+                //{
+                //    return LocalRedirect("/UserHomePage");
+                //}
+                //                var token = AuthenticationHelper.GenerateJwtToken(inputUser.Email, user, _configuration);
+                var tokenProvider = new AuthenticatorTokenProvider<ApplicationUser>();
+                //                var token = tokenProvider.
+//                var rootData = new SignUpResponse(token, user.UserName, user.Email);
                 return Page();
             }
 
             return Page();
 
         }
+
+        public async Task<IActionResult> OnPostLogIn(InputUserData inputUser)
+        {
+            ApplicationUser user = await _userManager.FindByNameAsync(inputUser.UserName);
+
+            if (user != null)
+            {
+                var result2 = await _signInManager.PasswordSignInAsync(user.Email, inputUser.Password, false, lockoutOnFailure: true);
+                if (result2.Succeeded)
+                {
+                    return LocalRedirect("/UserHomePage");
+                }
+            }
+            ErrorFlag = true;
+            return Page();
+        }
+
     }
 }
