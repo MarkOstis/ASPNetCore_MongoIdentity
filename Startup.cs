@@ -49,8 +49,15 @@ namespace ASPNetCore_MongoIdentity
                     }, mongoIdentityOptions =>
                     {
                         mongoIdentityOptions.ConnectionString = Configuration.GetConnectionString("MongoDbDatabase");
-                    })
-                .AddDefaultTokenProviders();
+                    });
+//                .AddDefaultTokenProviders();
+
+            //var authenticationBuilder = services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+            //    options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+            //    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+            //});
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
             services.AddAuthentication(options =>
@@ -77,19 +84,19 @@ namespace ASPNetCore_MongoIdentity
                        };
             });
 
-            services.ConfigureApplicationCookie(options =>
-            {
-                var cookieOptions = new Microsoft.AspNetCore.Http.CookieOptions()
-                {
-                    Path = "/",
-                    HttpOnly = false,
-                    IsEssential = true, //<- there
-                    Expires = DateTime.Now.AddMonths(3),
-                };
-//                options.LoginPath = $"/RegistrationPage";
-//                options.LogoutPath = $"/Identity/Account/Logout";
-//                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
-            });
+            //services.ConfigureApplicationCookie(options =>
+            //{
+            //    var cookieOptions = new Microsoft.AspNetCore.Http.CookieOptions()
+            //    {
+            //        Path = "/",
+            //        HttpOnly = false,
+            //        IsEssential = true, //<- there
+            //        Expires = DateTime.Now.AddMonths(3),
+            //    };
+            //    //                options.LoginPath = $"/RegistrationPage";
+            //    //                options.LogoutPath = $"/Identity/Account/Logout";
+            //    //                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+            //});
 
 
             services.AddMvc()
