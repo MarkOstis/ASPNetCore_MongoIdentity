@@ -25,9 +25,9 @@ namespace ASPNetCore_MongoIdentity.Pages
         }
 
 
-        public async Task<IActionResult> OnGet(InputUserData inputUser)
+        public async Task<IActionResult> OnGet()
         {
-            ApplicationUser user = await _userManager.FindByNameAsync(inputUser.UserName);
+            var user = await _userManager.GetUserAsync(HttpContext.User);
 
             if (user != null)
             {
@@ -38,19 +38,17 @@ namespace ASPNetCore_MongoIdentity.Pages
                     };
 
                 ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies", "user", "role"));
-                bool result3 = _signInManager.IsSignedIn(claimsPrincipal);
 
-                if (result3 == true)
+
+//                bool result3 = _signInManager.IsSignedIn(claimsPrincipal);
+
+//                if (result3 == true)
                 {
                     return Page();
                 }
-                else
-                {
-                    return Redirect("/RegistrationPage");
-                }
             }
-            //ErrorFlag = true;
-            return Page();
+//            ErrorFlag = true;
+            return Redirect("/RegistrationPage");
         }
     }
 }

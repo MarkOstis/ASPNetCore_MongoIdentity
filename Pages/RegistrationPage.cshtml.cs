@@ -74,6 +74,8 @@ namespace ASPNetCore_MongoIdentity.Pages
 
         public async Task<IActionResult> OnPostLogIn(InputUserData inputUser)
         {
+//            var userID = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             ApplicationUser user = await _userManager.FindByNameAsync(inputUser.UserName);
 
             if (user != null)
@@ -81,8 +83,9 @@ namespace ASPNetCore_MongoIdentity.Pages
                 var result2 = await _signInManager.PasswordSignInAsync(user.Email, inputUser.Password, false, lockoutOnFailure: true);
                 if (result2.Succeeded)
                 {
-                    string url = Url.Page("UserHomePage", new InputUserData { UserName = user.UserName });
-                    return Redirect(url);
+//                    string url = Url.Page("UserHomePage", new InputUserData { UserName = user.UserName });
+//                    return Redirect(url);
+                    return Redirect("/UserHomePage");
                 }
             }
             ErrorFlag = true;

@@ -16,6 +16,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace ASPNetCore_MongoIdentity
 {
@@ -40,72 +41,33 @@ namespace ASPNetCore_MongoIdentity
 
             services
                 .AddIdentityMongoDbProvider<ApplicationUser, ApplicationRole>(identityOptions =>
-                    {
-                        identityOptions.Password.RequiredLength = 6;
-                        identityOptions.Password.RequireLowercase = true;
-                        identityOptions.Password.RequireUppercase = true;
-                        identityOptions.Password.RequireNonAlphanumeric = true;
-                        identityOptions.Password.RequireDigit = true;
-                    }, mongoIdentityOptions =>
-                    {
-                        mongoIdentityOptions.ConnectionString = Configuration.GetConnectionString("MongoDbDatabase");
-                    });
-//                .AddDefaultTokenProviders();
+                {
+                    identityOptions.Password.RequiredLength = 6;
+                    identityOptions.Password.RequireLowercase = true;
+                    identityOptions.Password.RequireUppercase = true;
+                    identityOptions.Password.RequireNonAlphanumeric = true;
+                    identityOptions.Password.RequireDigit = true;
+                }, mongoIdentityOptions =>
+                {
+                    mongoIdentityOptions.ConnectionString = Configuration.GetConnectionString("MongoDbDatabase");
+                })
+                .AddDefaultTokenProviders();
 
-            //var authenticationBuilder = services.AddAuthentication(options =>
-            //{
-            //    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-            //    options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-            //    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-            //});
-
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
             services.AddAuthentication(options =>
             {
-                //Set default Authentication Schema as Bearer
-                options.DefaultAuthenticateScheme =
-                           JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme =
-                           JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme =
-                           JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(cfg =>
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie(options =>
             {
-                cfg.RequireHttpsMetadata = false;
-                cfg.SaveToken = true;
-                cfg.TokenValidationParameters =
-                       new TokenValidationParameters
-                       {
-                           ValidIssuer = Configuration["JwtIssuer"],
-                           ValidAudience = Configuration["JwtIssuer"],
-                           IssuerSigningKey =
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
-                           ClockSkew = TimeSpan.Zero // remove delay of token when expire
-                       };
+                options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/RegistrationPage");
             });
-
-            //services.ConfigureApplicationCookie(options =>
-            //{
-            //    var cookieOptions = new Microsoft.AspNetCore.Http.CookieOptions()
-            //    {
-            //        Path = "/",
-            //        HttpOnly = false,
-            //        IsEssential = true, //<- there
-            //        Expires = DateTime.Now.AddMonths(3),
-            //    };
-            //    //                options.LoginPath = $"/RegistrationPage";
-            //    //                options.LogoutPath = $"/Identity/Account/Logout";
-            //    //                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
-            //});
 
 
             services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-                //.AddRazorPagesOptions(option =>
-                //{
-                //    option.Conventions.AuthorizePage("/UserHomePage");
-                //});
-
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddRazorPagesOptions(option =>
+                {
+                    option.Conventions.AuthorizePage("/UserHomePage");
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
