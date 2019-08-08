@@ -29,9 +29,9 @@ namespace ASPNetCore_MongoIdentity.Pages
             _configuration = configuration;
         }
 
-        public async void OnGetAsync()
+        public void OnGet()
         {
-//            DisplayUsers.Add(await _userManager.FindByIdAsync("0"));
+            DisplayUsers = _userManager.Users.ToList<ApplicationUser>();
         }
 
         public async Task<IActionResult> OnPostRegisterNewUser(InputUserData inputUser)
@@ -67,6 +67,10 @@ namespace ASPNetCore_MongoIdentity.Pages
                     return Page();
                 }
             }
+
+            ErrorFlag = true;
+
+            DisplayUsers = _userManager.Users.ToList();
 
             return Page();
 
