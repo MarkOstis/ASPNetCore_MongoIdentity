@@ -6,3 +6,12 @@
 
 <h1>UserHomePage</h1>
 
+@if (Model.IsAdmin == true)
+{
+    <p>@Model.PageUser.UserName  is a Admin</p>
+}
+else
+{
+    <p>@Model.PageUser.UserName  is a Member</p>
+}
+

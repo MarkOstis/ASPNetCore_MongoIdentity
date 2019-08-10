@@ -1,6 +1,5 @@
 ﻿@page
 @model ASPNetCore_MongoIdentity.Pages.RegistrationPageModel
-@using ASPNetCore_MongoIdentity.Models
 @{
     ViewData["Title"] = "RegistrationPage";
 }
@@ -22,27 +21,37 @@
     {
         <p></p>
     }
-<form method="POST">
-    <input type="text" name="UserName" placeholder="UserName" /></br>
-    <input type="text" name="Password" placeholder="Password" /></br>
-    <input type="submit" asp-page-handler="RegisterNewUser" value="Register" />
-    <input type="submit" asp-page-handler="LogIn" value="LogIn" />
-</form>
+    <form method="POST">
+        <input type="text" name="UserName" placeholder="UserName" /></br>
+        <input type="text" name="Password" placeholder="Password" /></br>
+        <input type="text" name="ConfirmedPassword" placeholder="Confirm Password" /></br>
+        <input type="submit" asp-page-handler="RegisterNewUser" value="Register" />
+    </form>
 </div>
 <p></p>
-<table class="table">
-    <tr><td>Id</td><td>UserName</td><td>PasswordHash</td></tr>
-    @if (Model.DisplayUsers != null)
-    {
-        @foreach (ApplicationUser user in Model.DisplayUsers)
-        {
-            <tr>
-                <td>@user.Id</td>
-                <td>@user.UserName</td>
-                <td>@user.PasswordHash</td>
-            </tr>
+
+<h2>Ajax</h2>
+<p><button class="btn btn-primary" id="load">Load</button></p>
+<div id="grid"></div>
+@section scripts{
+    <script>
+        $(document).ready(
+            function () {
+                fill_table();
+            }
+        );
+        function fill_table() {
+            $('#grid').load('?handler=UserListPartial');
+            doStuff();
         }
 
-    }
-</table>
+        function doStuff() {
+            setTimeout(fill_table, 5000);
+        }
+
+    </script>
+}
+
+
+
 

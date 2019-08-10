@@ -17,16 +17,21 @@ namespace ASPNetCore_MongoIdentity.Pages
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
+        private readonly RoleManager<ApplicationRole> _roleManager;
 
         public bool ErrorFlag { get; set; }
 
         public List<ApplicationUser> DisplayUsers { get; set; }
 
-        public RegistrationPageModel(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+        public RegistrationPageModel(UserManager<ApplicationUser> userManager,
+                                     SignInManager<ApplicationUser> signInManager,
+                                     IConfiguration configuration,
+                                     RoleManager<ApplicationRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _roleManager = roleManager;
         }
 
         public void OnGet()
@@ -34,20 +39,31 @@ namespace ASPNetCore_MongoIdentity.Pages
             DisplayUsers = _userManager.Users.ToList<ApplicationUser>();
         }
 
-        public async Task<IActionResult> OnPostRegisterNewUser(InputUserData inputUser)
+        public async Task<IActionResult> OnPostRegisterNewUser(RegisterUser regUser)
         {
-            var user = new ApplicationUser { Name = inputUser.UserName,
-                                             UserName = inputUser.UserName,
-                                             Email = inputUser.UserName
+            var user = new ApplicationUser { Name = regUser.UserName,
+                                             UserName = regUser.UserName,
+                                             Email = regUser.UserName
             };
 
-            var result = await _userManager.CreateAsync(user, inputUser.Password);
+            bool isRoleExists = await _roleManager.RoleExistsAsync("Admin");
+            if (isRoleExists == false)
+            {
+                var role = new ApplicationRole();
+                role.Name = "Admin";
+                await _roleManager.CreateAsync(role);
+
+            }
+
+            var result = await _userManager.CreateAsync(user, regUser.Password);
             if (result.Succeeded)
             {
+                await _userManager.AddToRoleAsync(user, "Admin");
+
                 var claims = new List<Claim>
                 {
                     new Claim("user", user.UserName),
-                    new Claim("role", "Member")
+                    new Claim("role", "Admin")
                 };
                 result = await _userManager.AddClaimsAsync(user, claims);
 
@@ -64,7 +80,7 @@ namespace ASPNetCore_MongoIdentity.Pages
                     //               var tokenProvider = new AuthenticatorTokenProvider<ApplicationUser>();
                     //                var token = tokenProvider.
                     //                var rootData = new SignUpResponse(token, user.UserName, user.Email);
-                    return Page();
+                    return Redirect("/UserHomePage");
                 }
             }
 
@@ -76,25 +92,10 @@ namespace ASPNetCore_MongoIdentity.Pages
 
         }
 
-        public async Task<IActionResult> OnPostLogIn(InputUserData inputUser)
+        public PartialViewResult OnGetUserListPartial()
         {
-//            var userID = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            ApplicationUser user = await _userManager.FindByNameAsync(inputUser.UserName);
-
-            if (user != null)
-            {
-                var result2 = await _signInManager.PasswordSignInAsync(user.Email, inputUser.Password, false, lockoutOnFailure: true);
-                if (result2.Succeeded)
-                {
-//                    string url = Url.Page("UserHomePage", new InputUserData { UserName = user.UserName });
-//                    return Redirect(url);
-                    return Redirect("/UserHomePage");
-                }
-            }
-            ErrorFlag = true;
-            return Page();
+            DisplayUsers = _userManager.Users.ToList<ApplicationUser>();
+            return Partial("_UserListPartial", this);
         }
-
     }
 }

@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
 
 namespace ASPNetCore_MongoIdentity
 {
@@ -32,6 +34,14 @@ namespace ASPNetCore_MongoIdentity
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //var environment = services.BuildServiceProvider().GetRequiredService<IHostingEnvironment>();
+
+
+            //services.AddDataProtection()
+            //        .SetApplicationName($"my-app-{environment.EnvironmentName}")
+            //        .PersistKeysToFileSystem(new DirectoryInfo($@"{environment.ContentRootPath}\keys"));
+
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -64,9 +74,13 @@ namespace ASPNetCore_MongoIdentity
 
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddRazorPagesOptions(option =>
+                .AddRazorPagesOptions(options =>
                 {
-                    option.Conventions.AuthorizePage("/UserHomePage");
+                    options.Conventions.AuthorizePage("/UserHomePage");
+                })
+                .AddRazorOptions(options =>
+                {
+                    options.PageViewLocationFormats.Add("/Pages/Partials/{0}.cshtml");
                 });
         }
 

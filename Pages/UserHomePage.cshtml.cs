@@ -17,6 +17,10 @@ namespace ASPNetCore_MongoIdentity.Pages
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
 
+        public bool IsAdmin { get; set; }
+        public ApplicationUser PageUser { get; set; }
+
+
         public UserHomePageModel(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
         {
             _userManager = userManager;
@@ -31,6 +35,9 @@ namespace ASPNetCore_MongoIdentity.Pages
 
             if (user != null)
             {
+                PageUser = user;
+                IsAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
                 var claims = new List<Claim>
                     {
                         new Claim("user", user.UserName),
@@ -40,7 +47,7 @@ namespace ASPNetCore_MongoIdentity.Pages
                 ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies", "user", "role"));
 
 
-//                bool result3 = _signInManager.IsSignedIn(claimsPrincipal);
+                bool result3 = _signInManager.IsSignedIn(claimsPrincipal);
 
 //                if (result3 == true)
                 {
