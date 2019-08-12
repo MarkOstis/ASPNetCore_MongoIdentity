@@ -1,14 +1,13 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@using ASPNetCore_MongoIdentity.Models
-@model ASPNetCore_MongoIdentity.Pages.RegistrationPageModel
+
 
     <table class="table">
         <tr><td>Id</td><td>UserName</td></tr>
         @if (Model != null)
         {
-            @foreach (ApplicationUser user in Model.DisplayUsers)
+            @foreach (var user in Model.DisplayUsers)
             {
                 <tr>
                     <td>@user.Id</td>

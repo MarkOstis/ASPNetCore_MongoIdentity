@@ -19,6 +19,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using System.IO;
+using ASPNetCore_MongoIdentity.Services;
 
 namespace ASPNetCore_MongoIdentity
 {
@@ -34,19 +35,12 @@ namespace ASPNetCore_MongoIdentity
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //var environment = services.BuildServiceProvider().GetRequiredService<IHostingEnvironment>();
-
-
-            //services.AddDataProtection()
-            //        .SetApplicationName($"my-app-{environment.EnvironmentName}")
-            //        .PersistKeysToFileSystem(new DirectoryInfo($@"{environment.ContentRootPath}\keys"));
-
-
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
+                
             });
 
             services
@@ -68,7 +62,7 @@ namespace ASPNetCore_MongoIdentity
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             }).AddCookie(options =>
             {
-                options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/RegistrationPage");
+                options.LoginPath = "/RegistrationPage";
             });
 
 

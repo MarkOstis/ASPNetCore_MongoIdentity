@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
+using ASPNetCore_MongoIdentity.Services;
 
 namespace ASPNetCore_MongoIdentity.Pages
 {
@@ -94,6 +95,7 @@ namespace ASPNetCore_MongoIdentity.Pages
 
         public PartialViewResult OnGetUserListPartial()
         {
+            int counter = SimpleCounterService.GetCounter();
             DisplayUsers = _userManager.Users.ToList<ApplicationUser>();
             return Partial("_UserListPartial", this);
         }
